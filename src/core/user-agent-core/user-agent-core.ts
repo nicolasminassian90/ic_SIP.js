@@ -563,7 +563,16 @@ export class UserAgentCore {
     // requests outside of a dialog, discussed in Section 8.2.
     // https://tools.ietf.org/html/rfc3261#section-12.2.2
     if (message.toTag) {
-      this.receiveInsideDialogRequest(message);
+      //Hack Inconcert Message.
+      //Asterisk not support SIP Message Outside Dialog with WSS (only UDP)
+      //This is supported in PJSIP. 
+      //https://stackoverflow.com/questions/34707967/asterisk-sendmessage-not-going-to-ws
+      //https://wiki.asterisk.org/wiki/display/AST/Asterisk+16+Application_MessageSend
+      if (message.cseq === 102 && message.method === "MESSAGE") {
+        this.receiveOutsideDialogRequest(message);
+      } else {
+        this.receiveInsideDialogRequest(message);
+      }
     } else {
       this.receiveOutsideDialogRequest(message);
     }
